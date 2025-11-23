@@ -3,7 +3,7 @@ from django.db import models
 class Product(models.Model):
     name = models.CharField( max_length=150)
     category = models.CharField( max_length=150)
-    price  = models.IntegerField()
+    price  = models.DecimalField(max_digits=5, decimal_places=2)
     quantity  = models.IntegerField()
     rating = models.DecimalField(max_digits=5, decimal_places=2)
     active = models.BooleanField(default=True)
