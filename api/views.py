@@ -13,7 +13,7 @@ def to_json(product:Product)->dict:
         "rating":product.rating,
         "active":product.active,
         "create_at":product.create_at.strftime('%d/%m/%Y, %H:%M:%S'),
-        "update_at":product.update_at.strftime('%d/%m/%Y, %H:%M:%S')   #DateTimeni stringga o'tgarib beradi
+        "update_at":product.update_at.strftime('%d/%m/%Y, %H:%M:%S')   #DateTimeni stringga o'zgarib beradi
 
 }
 
@@ -21,12 +21,11 @@ def to_json(product:Product)->dict:
 def product_view(request:HttpRequest)->JsonResponse:
 
     if request.method == "POST":
+    
         result = []
 
         data = json.loads(request.body.decode())
         for item in data:
-
-        
             new_product = Product(
                 name = item.get('name', ''),
                 category = item.get('category', ''),
@@ -39,5 +38,32 @@ def product_view(request:HttpRequest)->JsonResponse:
 
         return JsonResponse(data={'result':result, 'count':len(result)},status=201)
 
-    
+    if request.method == "GET":
+        params = request.GET
+        products = Product.objects.all(active=False)
+        
+        category = params.get('category')
+        if category:
+            products = products.filter(category=category)
+        
+        max_price = params.get('max_price')
+        min_price = params.get('min_price')
+
+        if max_price and min_price:
+            products = products.filter(price__gte=min_price, price__lte=max_price)
+
+        rating = params.get('rating')
+
+        if rating:
+            products = products.filter(rating__gt=rating)
+
+
+
+        result = []
+
+        for product in products:
+            result.append(to_json(product))
+
+        return JsonResponse(data={'count':len(result),'result':result})
+
     return JsonResponse(data={})
