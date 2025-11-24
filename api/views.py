@@ -12,8 +12,8 @@ def to_json(product:Product)->dict:
         "quantity":product.quantity,
         "rating":product.rating,
         "active":product.active,
-        "create_at":product.create_at.strftime('%d/%m/%Y, %H:%M:%S'),
-        "update_at":product.update_at.strftime('%d/%m/%Y, %H:%M:%S')   #DateTimeni stringga o'zgarib beradi
+        "create_at":product.create_at.strftime('%d/%m/%Y, %H:%M:%S.%f')[:-3],
+        "update_at":product.update_at.strftime('%d/%m/%Y, %H:%M:%S.%f')[:-3]   #DateTimeni stringga o'zgarib beradi
 
 }
 
@@ -40,7 +40,8 @@ def product_view(request:HttpRequest)->JsonResponse:
 
     if request.method == "GET":
         params = request.GET
-        products = Product.objects.all(active=False)
+        products = Product.objects.filter(active=True).order_by('create_at') # ASC -> o'sish bulsa 
+      # products = Product.objects.filter(active=True).order_by('-create_at')  DESC -> kamayish bulsa_> oldiga - ishora quysak kamayish tartibida malumot sortledi
         
         category = params.get('category')
         if category:
