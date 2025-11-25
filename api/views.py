@@ -40,18 +40,41 @@ def product_view(request:HttpRequest)->JsonResponse:
 
     if request.method == "GET":
         params = request.GET
-        products = Product.objects.filter(active=True).order_by('create_at') # ASC -> o'sish bulsa 
-      # products = Product.objects.filter(active=True).order_by('-create_at')  DESC -> kamayish bulsa_> oldiga - ishora quysak kamayish tartibida malumot sortledi
-        
+    # products = Product.objects.filter(active=True).order_by('create_at') # ASC -> o'sish bulsa 
+    # products = Product.objects.filter(active=True).order_by('-create_at')  DESC -> kamayish bulsa_> oldiga - ishora quysak kamayish tartibida malumot sortledi
+    # products = Product.objects.order_by('price')
+    
+     
+        products = Product.objects.all()
+
+    # products = products.reverse()  # bu order_by bilan tartiblab olingan bulsa reverse() teskarisiga o'girb beradi 
+    # products = Product.objects.create(name='ali',category='ali',price=10,quantity=15,rating=5)
+
+        # products.save()
+
+        # print(products)
+
+        name = params.get('name')
+
+        if name:
+            products=products.filter(name=name)
+
+
         category = params.get('category')
         if category:
             products = products.filter(category=category)
         
+        price = params.get('price')
+
+        if price:
+            products = products.exclude(price__gte=price)  #exclude filterni NOT() inkori
+
         max_price = params.get('max_price')
         min_price = params.get('min_price')
 
-        if max_price and min_price:
-            products = products.filter(price__gte=min_price, price__lte=max_price)
+        # if max_price and min_price:
+        #     products = products.filter(price__gte=min_price, price__lte=max_price)
+        #     product = products.filter()
 
         rating = params.get('rating')
 
